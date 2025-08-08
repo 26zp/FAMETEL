@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fametel - Sistema de Acceso</title>
+    <link rel="stylesheet" href="styles_Login.css">
+</head>
+<body>
+    <!-- Partículas de fondo -->
+    <div class="particles" id="particles"></div>
+    
+    <div class="login-container">
+        <a href="../inicio.html" class="close-btn">×</a>
+        <div class="user-type-selector">
+            <button class="user-type-btn active" data-type="admin">
+                🔧 Administrador
+            </button>
+            <button class="user-type-btn" data-type="worker">
+                👨‍💻 Trabajador
+            </button>
+        </div>
+
+        <div class="logo-container">
+            <!-- 🔧 AQUÍ ESTÁ EL LOGO - Reemplaza 'logo.png' con tu archivo -->
+            <img src="../../logo.png" alt="Logo" class="logo">
+        </div>
+
+        <h1 class="company-name">FAMETEL</h1>
+        <p class="subtitle">Sistema de Acceso</p>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Usuario</label>
+                <input type="text" id="username" name="username" placeholder="Ingresa tu usuario" required>
+                <div class="scan-line"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" required>
+                <div class="scan-line"></div>
+            </div>
+
+            <button type="submit" class="login-btn">
+                Acceder al Sistema
+            </button>
+        </form>
+
+        <div class="forgot-password">
+            <a href="#">¿Olvidaste tu contraseña?</a>
+        </div>
+    </div>
+
+    <script src="script_Login.js"></script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+/* Estilos del Menú de Navegación */
+.nav-container {
+    width: 90%;
+    max-width: 75rem;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+}
+
+.menu-button {
+    background: rgba(0, 170, 255, 0.1);
+    border: 1px solid rgba(0, 170, 255, 0.3);
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: #fff;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.menu-button:hover {
+    background: rgba(0, 170, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 170, 255, 0.2);
+}
+
+.menu-button i {
+    font-size: 1.1rem;
+}
+
+.services-dropdown {
+    position: relative;
+    display: inline-block;
+    z-index: 2000;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: rgba(0, 0, 0, 0.95);
+    min-width: 250px;
+    border-radius: 0.5rem;
+    padding: 15px;
+    z-index: 2000;
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(0, 170, 255, 0.3);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    margin-top: 5px;
+}
+
+.services-dropdown:hover .dropdown-content {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-content a {
+    color: #fff;
+    padding: 12px 15px;
+    text-decoration: none;
+    display: block;
+    border-radius: 0.3rem;
+    transition: all 0.2s ease;
+    margin-bottom: 5px;
+}
+
+.dropdown-content a:hover {
+    background: rgba(0, 170, 255, 0.2);
+    transform: translateX(8px);
+    border-left: 3px solid #00aaff;
+}
+
+/* Estilos para los botones de servicio en el menú */
+.nav-service-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.service-button {
+    background: rgba(0, 170, 255, 0.1);
+    border: 1px solid rgba(0, 170, 255, 0.3);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.service-button:hover {
+    background: rgba(0, 170, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 170, 255, 0.2);
+}
+
+.service-button i {
+    font-size: 1.2rem;
+}

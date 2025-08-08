@@ -1,0 +1,70 @@
+/* ===== ANIMACIÓN DE CARGA FAMETEL ===== */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #001122 0%, #003366 50%, #001a33 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loading-logo {
+    width: 180px;
+    height: auto;
+    filter: drop-shadow(0 0 20px rgba(0, 170, 255, 0.6));
+    animation: loadingPulse 2s ease-in-out infinite;
+}
+
+.loading-title {
+    font-size: 4rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, #00aaff, #0066cc, #004499);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(0, 170, 255, 0.5);
+    letter-spacing: 6px;
+    margin: 2rem 0 1rem 0;
+    animation: titleGlow 2s ease-in-out infinite alternate;
+}
+
+.loading-subtitle {
+    font-size: 1.2rem;
+    color: #b0b0b0;
+    letter-spacing: 3px;
+    margin-bottom: 3rem;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(0, 170, 255, 0.3);
+    border-top: 3px solid #00aaff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes loadingPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes titleGlow {
+    from { text-shadow: 0 0 20px rgba(0, 170, 255, 0.5); }
+    to { text-shadow: 0 0 40px rgba(0, 170, 255, 0.8); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

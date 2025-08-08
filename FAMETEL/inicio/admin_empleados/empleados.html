@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Administrativo - FAMETEL</title>
+    <link rel="stylesheet" href="empleados.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <button class="sidebar-back" onclick="goBack()">←</button>
+            <span class="sidebar-logo">FAMETEL</span>
+        </div>
+
+    <!-- Payment Modal -->
+    <div class="modal" id="payment-modal">
+        <div class="modal-content payment-modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Módulo de Abono</h2>
+                <button class="modal-close" onclick="closeModal('payment-modal')">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Monto</label>
+                <input type="number" class="form-input" placeholder="90.00" step="0.01">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Tipo de Pago</label>
+                <select class="form-select">
+                    <option>Seleccionar</option>
+                    <option>Efectivo</option>
+                    <option>Transferencia</option>
+                    <option>Cheque</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">¿Desean detallar el Pago.....?</label>
+                <textarea class="form-textarea" placeholder="Descripción del pago"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-cancel" onclick="closeModal('payment-modal')">Cerrar</button>
+                <button class="btn-primary" onclick="processPayment()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div class="modal" id="receipt-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📄 Comprobante de Pago # 1</h2>
+                <button class="modal-close" onclick="closeModal('receipt-modal')">×</button>
+            </div>
+            
+            <div style="text-align: center; margin-bottom: 20px;">
+                <p>Elija el tipo del documento:</p>
+            </div>
+            
+            <div class="doc-selector">
+                <div class="doc-type selected" onclick="selectDocType('comprobante')">
+                    <div style="font-size: 24px; margin-bottom: 10px;">📄</div>
+                    <div>Comprobante</div>
+                </div>
+                <div class="doc-type" onclick="selectDocType('imprimir')">
+                    <div style="font-size: 24px; margin-bottom: 10px;">🖨️</div>
+                    <div>Imprimir Comprobante</div>
+                </div>
+            </div>
+            
+            <div class="receipt-options">
+                <button class="receipt-btn" onclick="generateReceipt()">📄 Generar Comprobante</button>
+                <button class="receipt-btn" onclick="printReceipt()">🖨️ Imprimir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gasto Modal -->
+    <div class="modal" id="gasto-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">🔒 Nuevo Registro</h2>
+                <button class="modal-close" onclick="closeModal('gasto-modal')">×</button>
+            </div>
+            
+            <div class="expense-form">
+                <div class="form-group">
+                    <label class="form-label">Usuario *</label>
+                    <input type="text" class="form-input" placeholder="Ingrese el nombre del usuario">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Monto *</label>
+                    <input type="number" class="form-input" placeholder="Ingrese el monto" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Proyecto *</label>
+                    <select class="form-select">
+                        <option>Seleccione una opción</option>
+                        <option>PLAZA VEA</option>
+                        <option>Otros</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Descripción *</label>
+                    <textarea class="form-textarea" placeholder="Describa el gasto"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Tipo de Gasto *</label>
+                    <select class="form-select">
+                        <option>Seleccione una opción</option>
+                        <option>Materiales</option>
+                        <option>Transporte</option>
+                        <option>Alimentación</option>
+                        <option>Servicios</option>
+                        <option>Otros</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Fecha *</label>
+                    <input type="date" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Áreas *</label>
+                    <select class="form-select">
+                        <option>Seleccione una opción</option>
+                        <option>Construcción</option>
+                        <option>Administración</option>
+                        <option>Logística</option>
+                    </select>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label class="form-label">Comprobante *</label>
+                    <input type="file" class="form-input" accept=".pdf,.jpg,.png,.doc,.docx">
+                    <small>No se ha seleccionado ningún archivo</small>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-primary" onclick="saveGasto()">💾 Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aporte Modal -->
+    <div class="modal" id="aporte-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">🔒 Nuevo Registro</h2>
+                <button class="modal-close" onclick="closeModal('aporte-modal')">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Monto *</label>
+                <input type="number" class="form-input" placeholder="Ingrese el monto" step="0.01">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Usuario *</label>
+                <input type="text" class="form-input" placeholder="Aportante">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Fecha *</label>
+                <input type="date" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Descripción *</label>
+                <textarea class="form-textarea" placeholder="Añada una descripción detallada"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-cancel" onclick="closeModal('aporte-modal')">Cerrar</button>
+                <button class="btn-primary" onclick="saveAporte()">💾 Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="empleados.js"></script>
+</body>
+</html>>
+
+        <div class="menu-title">MENÚ PRINCIPAL</div>
+
+        <button class="menu-item active" onclick="showPage('dashboard')">
+            <span class="icon">🏠</span>
+            Inicio
+        </button>
+
+        <button class="menu-item" onclick="toggleSubmenu('proyectos')">
+            <span class="icon">🔧</span>
+            Proyectos
+            <span class="dropdown-arrow">▶</span>
+        </button>
+        <div class="submenu" id="proyectos-submenu">
+            <button class="submenu-item" onclick="showPage('obras')">→ Obras</button>
+            <button class="submenu-item" onclick="showPage('sistemas')">→ Sistemas</button>
+        </div>
+
+        <button class="menu-item" onclick="toggleSubmenu('usuario')">
+            <span class="icon">👥</span>
+            Usuario
+            <span class="dropdown-arrow">▶</span>
+        </button>
+        <div class="submenu" id="usuario-submenu">
+            <button class="submenu-item" onclick="showPage('personal')">→ Personal</button>
+            <button class="submenu-item" onclick="showPage('empresa')">→ Empresa / Contratista</button>
+            <button class="submenu-item" onclick="showPage('proveedor')">→ Proveedor</button>
+        </div>
+
+        <button class="menu-item" onclick="toggleSubmenu('asistencia')">
+            <span class="icon">📋</span>
+            Asistencia
+            <span class="dropdown-arrow">▶</span>
+        </button>
+        <div class="submenu" id="asistencia-submenu">
+            <button class="submenu-item" onclick="showPage('marcar-asistencia')">→ Marcar Asistencia</button>
+            <button class="submenu-item" onclick="showPage('asistencia-masiva')">→ Marcar Asistencia Masiva</button>
+            <button class="submenu-item" onclick="showPage('asistencia-general')">→ Asistencia General</button>
+            <button class="submenu-item" onclick="showPage('asistencia-usuario')">→ Asistencia por Usuario</button>
+            <button class="submenu-item" onclick="showPage('reporte-fecha')">→ Reporte Fecha</button>
+            <button class="submenu-item" onclick="showPage('planilla-empresa')">→ Planilla Empresa</button>
+            <button class="submenu-item" onclick="showPage('planilla-contratista')">→ Planilla Contratista</button>
+        </div>
+
+        <button class="menu-item" onclick="toggleSubmenu('presupuestos')">
+            <span class="icon">💰</span>
+            Presupuestos
+            <span class="dropdown-arrow">▶</span>
+        </button>
+        <div class="submenu" id="presupuestos-submenu">
+            <button class="submenu-item" onclick="showPage('gastos-generales')">→ Gastos Generales</button>
+            <button class="submenu-item" onclick="showPage('techo-presupuestal')">→ Techo Presupuestal</button>
+            <button class="submenu-item" onclick="showPage('aportes')">→ Aportes</button>
+        </div>
+
+        <button class="menu-item" onclick="toggleSubmenu('backup')">
+            <span class="icon">💾</span>
+            Backup
+            <span class="dropdown-arrow">▶</span>
+        </button>
+        <div class="submenu" id="backup-submenu">
+            <button class="submenu-item" onclick="showPage('generar-backup')">→ Generar Backup</button>
+            <button class="submenu-item" onclick="showPage('restaurar-backup')">→ Restaurar Backup</button>
+        </div>
+
+        <button class="menu-item" onclick="showPage('ayuda')">
+            <span class="icon">❓</span>
+            Ayuda
+        </button>
+    </nav>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Buscar...">
+        </div>
+        
+        <div class="header-right">
+            <button class="notification-bell">
+                🔔
+                <span class="notification-badge">9</span>
+            </button>
+            
+            <div class="user-profile">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <div class="user-name">Administrador</div>
+                    <div class="user-role">S&T</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Page -->
+        <div class="page active" id="dashboard">
+            <h1 class="page-title">BIENVENIDO AL SISTEMA - ESTAS EN MODO ADMINISTRADOR</h1>
+            
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-icon blue">🗄️</div>
+                    <div class="card-title">Base de Datos</div>
+                    <div class="card-subtitle">Gestión de datos del sistema</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon red">💾</div>
+                    <div class="card-title">Respaldos</div>
+                    <div class="card-subtitle">Copias de seguridad</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon green">📊</div>
+                    <div class="card-title">Reportes</div>
+                    <div class="card-subtitle">Análisis y estadísticas</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon orange">👥</div>
+                    <div class="card-title">Usuarios</div>
+                    <div class="card-subtitle">Gestión de personal</div>
+                </div>
+            </div>
+
+            <div class="card" style="text-align: center; padding: 60px;">
+                <div style="font-size: 60px; color: #ed8936; margin-bottom: 20px;">⚙️</div>
+                <h2 style="color: #2d3748; margin-bottom: 10px;">Sistema Administrativo FAMETEL</h2>
+                <p style="color: #718096;">Gestión integral de proyectos y recursos</p>
+                <div style="margin-top: 30px; color: #a0aec0;">Casasinmuebles - 2024.</div>
+            </div>
+        </div>
+
+        <!-- Sistemas Page -->
+        <div class="page" id="sistemas">
+            <div class="page-header">
+                <h1 class="page-title">LISTA DE SISTEMAS</h1>
+                <button class="btn-primary" onclick="openModal('sistemas-modal')">Registrar</button>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-controls">
+                    <select class="table-select">
+                        <option>Mostrar 10 registros</option>
+                        <option>Mostrar 25 registros</option>
+                        <option>Mostrar 50 registros</option>
+                    </select>
+                    <input type="text" class="table-search" placeholder="Buscar...">
+                </div>
+                
+                <table id="sistemas-table">
+                    <thead>
+                        <tr>
+                            <th>Sistema</th>
+                            <th>Código</th>
+                            <th>Título Inicio</th>
+                            <th>Característica</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>RR-HH</td>
+                            <td>2060703</td>
+                            <td>RR-HH</td>
+                            <td>Sistema de Recursos Humanos</td>
+                            <td class="table-actions">
+                                <button class="btn-icon btn-edit" title="Editar">✏️</button>
+                                <button class="btn-icon btn-delete" title="Eliminar">🗑️</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination">
+                    <button class="pagination-btn">Anterior</button>
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn">Siguiente</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Obras Page -->
+        <div class="page" id="obras">
+            <div class="page-header">
+                <h1 class="page-title">LISTA DE PROYECTOS</h1>
+                <button class="btn-primary" onclick="openModal('obras-modal')">Registrar</button>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-controls">
+                    <select class="table-select">
+                        <option>Mostrar 10 registros</option>
+                        <option>Mostrar 25 registros</option>
+                        <option>Mostrar 50 registros</option>
+                    </select>
+                    <input type="text" class="table-search" placeholder="Buscar...">
+                </div>
+                
+                <table id="obras-table">
+                    <thead>
+                        <tr>
+                            <th>Razón Social</th>
+                            <th>RUC</th>
+                            <th>Gerente / Residente</th>
+                            <th>Teléfono</th>
+                            <th>Correo</th>
+                            <th>Proyecto</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CONSTRUCTOR SAC</td>
+                            <td>20487131901</td>
+                            <td>Julia Chamorro</td>
+                            <td>876543221</td>
+                            <td>julia@constructor.com</td>
+                            <td>PLAZA VEA</td>
+                            <td class="table-actions">
+                                <button class="btn-icon btn-edit" title="Editar">✏️</button>
+                                <button class="btn-icon btn-delete" title="Eliminar">🗑️</button>
+                                <button class="btn-icon btn-view" title="Ver detalles" onclick="showProjectDetails('PLAZA VEA')">👁️</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination">
+                    <span>Mostrando registros del 1 al 1 de un total de 1 registros</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Details Page -->
+        <div class="page" id="project-details">
+            <div class="page-header">
+                <div>
+                    <button class="btn-primary" onclick="goBack()">← Retroceder</button>
+                    <h1 class="page-title">Lista de mis Pagos 98765435</h1>
+                </div>
+            </div>
+
+            <div class="project-highlight">
+                <div class="project-info">
+                    <div class="project-details">
+                        <h2>PLAZA VEA</h2>
+                        <p>Proyecto: Pinturas</p>
+                    </div>
+                    <div>
+                        <div class="project-amount">S/ 5,000.00</div>
+                        <div class="action-buttons">
+                            <button class="btn-primary" onclick="openModal('payment-modal')">💳 Abonar</button>
+                            <button class="btn-secondary">👥 Trabajadores: S/ 0.00</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-cards">
+                <div class="summary-card" style="background: linear-gradient(135deg, #48bb78, #38a169);">
+                    <h3>Pendientes a Saldar</h3>
+                    <div class="amount">S/ 0.00</div>
+                </div>
+                <div class="summary-card" style="background: linear-gradient(135deg, #ed8936, #dd6b20);">
+                    <h3>Monto Invertido</h3>
+                    <div class="amount">S/ 0.00</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    Deuda Pendiente
+                    <div>Monto a Pagar S/ 90.00</div>
+                </div>
+                <div class="table-controls">
+                    <select class="table-select">
+                        <option>Mostrar 10 registros</option>
+                    </select>
+                    <input type="text" class="table-search" placeholder="Buscar...">
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Monto</th>
+                            <th>Tipo Pago</th>
+                            <th>Detalle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #718096; padding: 40px;">
+                                Ningún dato disponible en esta tabla
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Personal Page -->
+        <div class="page" id="personal">
+            <div class="page-header">
+                <h1 class="page-title">LISTA DE ADMINISTRATIVOS</h1>
+                <div>
+                    <button class="btn-primary" onclick="openModal('personal-modal')">Registrar</button>
+                    <button class="btn-secondary" onclick="openModal('cargos-modal')">+ Cargos</button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-controls">
+                    <select class="table-select">
+                        <option>Mostrar 10 registros</option>
+                        <option>Mostrar 25 registros</option>
+                        <option>Mostrar 50 registros</option>
+                    </select>
+                    <input type="text" class="table-search" placeholder="Buscar...">
+                </div>
+                
+                <table id="personal-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>DNI</th>
+                            <th>Teléfono</th>
+                            <th>Cargo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>70933255</td>
+                            <td>Administrador S&T</td>
+                            <td>70933255</td>
+                            <td>-</td>
+                            <td>Desarrollador</td>
+                            <td><span class="status-active">✓</span></td>
+                            <td class="table-actions">
+                                <button class="btn-icon btn-edit" title="Editar">✏️</button>
+                                <button class="btn-icon btn-view" title="Ver">👁️</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination">
+                    <span>Mostrando registros del 1 al 1 de un total de 1 registros</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empresa Page -->
+        <div class="page" id="empresa">
+            <div class="page-header">
+                <h1 class="page-title">Lista de Contratistas</h1>
+                <button class="btn-primary" onclick="openModal('empresa-modal')">Registrar</button>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-controls">
+                    <select class="table-select">
+                        <option>Mostrar 10 registros</option>
+                        <option>Mostrar 25 registros</option>
+                        <option>Mostrar 50 registros</option>
+                    </select>
+                    <input type="text" class="table-search" placeholder="Buscar...">
+                </div>
+                
+                <table id="empresa-table">
+                    <thead>
+                        <tr>
+                            <th>Empresa</th>
+                            <th>RUC</th>
+                            <th>Responsable</th>
+                            <th>Obras</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CONSTRUCTOR SAC</td>
+                            <td>20487131901</td>
+                            <td>Julia Chamorro</td>
+                            <td>📋</td>
+                            <td><span class="status-active">✓</span></td>
+                            <td class="table-actions">
+                                <button class="btn-icon btn-edit" title="Editar">✏️</button>
+                                <button class="btn-icon btn-delete" title="Eliminar">🗑️</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>oroya center</td>
+                            <td>5477777777</td>
+                            <td>JAVIER CAJAHUAMAN MALLCCO</td>
+                            <td>📋</td>
+                            <td><span class="status-active">✓</span></td>
+                            <td class="table-actions">
+                                <button class="btn-icon btn-edit" title="Editar">✏️</button>
+                                <button class="btn-icon btn-delete" title="Eliminar">🗑️</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination">
+                    <span>Mostrando registros del 1 al 2 de un total de 2 registros</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Proveedor Page -->
+        <div class="page" id="proveedor">
+            <div class="page-header">
+                <h1 class="page-title">REGISTRO DE PROVEEDORES</h1>
+                <button class="btn-primary" onclick="openModal('proveedor-modal')">Registrar</button>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-controls">
+                    <select class="table-select">
+                        <option>Mostrar 10 registros</option>
+                        <option>Mostrar 25 registros</option>
+                        <option>Mostrar 50 registros</option>
+                    </select>
+                    <input type="text" class="table-search" placeholder="Buscar...">
+                </div>
+                
+                <table id="proveedor-table">
+                    <thead>
+                        <tr>
+                            <th>Razón social</th>
+                            <th>RUC</th>
+                            <th>Teléfono</th>
+                            <th>Encargado</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #718096; padding: 40px;">
+                                Ningún dato disponible en esta tabla
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination">
+                    <span>Mostrando registros del 0 al 0 de un total de 0 registros</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marcar Asistencia Page -->
+        <div class="page" id="marcar-asistencia">
+            <div class="table-header" style="margin-bottom: 20px;">Registro de Asistencia</div>
+            
+            <div class="scanner-container">
+                <button class="btn-primary" onclick="startScanner()">📷 Iniciar Escaneo</button>
+                
+                <input type="text" class="scanner-input" placeholder="Escanea aquí el código de barras o QR" id="scanner-input">
+                
+                <div class="user-data" id="user-data" style="display: none;">
+                    <h3 style="margin-bottom: 15px; color: #2d3748;">Datos del Usuario</h3>
+                    <div class="data-row">
+                        <span class="data-label">Código:</span>
+                        <span class="data-value" id="user-code">[0000]</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">DNI:</span>
+                        <span class="data-value" id="user-dni">[0000]</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Nombres:</span>
+                        <span class="data-value" id="user-names">[---]</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Apellidos:</span>
+                        <span class="data-value" id="user-surnames">[---]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Asistencia General Page -->
+        <div class="page" id="asistencia-general">
+            <div class="table-header" style="margin-bottom: 20px;">Lista de Asistencia</div>
+            
+            <div class="table-container">
+                <div class="table-controls">
+                    <select class="table-select">
+                        <option>Mostrar 10 registros</option>
+                        <option>Mostrar 25 registros</option>
+                        <option>Mostrar 50 registros</option>
+                    </select>
+                    <input type="text" class="table-search" placeholder="Buscar...">
+                </div>
+                
+                <table id="asistencia-table">
+                    <thead>
+                        <tr>
+                            <th>Trabajador</th>
+                            <th>Hora Entrada</th>
+                            <th>Hora Salida</th>
+                            <th>Justificación</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Saul, Peréz Cueva</td>
+                            <td>2024-10-30 19:17:56</td>
+                            <td>2024-10-30 19:19:34</td>
+                            <td><button class="btn-primary" onclick="openModal('justificar-modal')">Justificar</button></td>
+                            <td><span class="status-active">Normal</span></td>
+                            <td class="table-actions">
+                                <button class="btn-icon btn-view" onclick="showJustifications()">ℹ️</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Asistencia por Usuario Page -->
+        <div class="page" id="asistencia-usuario">
+            <div class="table-header" style="margin-bottom: 20px;">Lista de Asistencia</div>
+            
+            <div class="table-container">
+                <table id="asistencia-usuario-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>DNI</th>
+                            <th>Teléfono</th>
+                            <th>Asistencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>70933255</td>
+                            <td>Administrador S&T</td>
+                            <td>70933255</td>
+                            <td>-</td>
+                            <td><a href="#" onclick="showUserCalendar('70933255')" style="color: #4299e1;">Asistencia</a></td>
+                        </tr>
+                        <tr>
+                            <td>98765435</td>
+                            <td>Saul Peréz Cueva</td>
+                            <td>98765435</td>
+                            <td>987654321</td>
+                            <td><a href="#" onclick="showUserCalendar('98765435')" style="color: #4299e1;">Asistencia</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- User Calendar View -->
+        <div class="page" id="user-calendar">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">📋 Mi registro de Asistencia</h1>
+                </div>
+                <button class="btn-primary" onclick="goBack()">← Retroceder</button>
+            </div>
+            
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button class="btn-primary" onclick="changeMonth(-1)">Anterior</button>
+                    <div class="calendar-month" id="current-month">October 2024</div>
+                    <button class="btn-primary" onclick="changeMonth(1)">Siguiente</button>
+                </div>
+                
+                <div class="calendar-grid" id="calendar-grid">
+                    <div class="calendar-day" style="background: #f7fafc; font-weight: 600;">Lunes</div>
+                    <div class="calendar-day" style="background: #f7fafc; font-weight: 600;">Martes</div>
+                    <div class="calendar-day" style="background: #f7fafc; font-weight: 600;">Miércoles</div>
+                    <div class="calendar-day" style="background: #f7fafc; font-weight: 600;">Jueves</div>
+                    <div class="calendar-day" style="background: #f7fafc; font-weight: 600;">Viernes</div>
+                    <div class="calendar-day" style="background: #f7fafc; font-weight: 600;">Sábado</div>
+                    <div class="calendar-day" style="background: #f7fafc; font-weight: 600;">Domingo</div>
+                    
+                    <!-- Days will be generated by JavaScript -->
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h3>Resumen de Asistencia</h3>
+                    <div class="summary-cards">
+                        <div class="summary-card" style="background: linear-gradient(135deg, #48bb78, #38a169);">
+                            <h3>📅 Días Normales</h3>
+                            <div class="amount">1</div>
+                        </div>
+                        <div class="summary-card" style="background: linear-gradient(135deg, #ed8936, #dd6b20);">
+                            <h3>⏰ Días Tarde</h3>
+                            <div class="amount">0</div>
+                        </div>
+                        <div class="summary-card" style="background: linear-gradient(135deg, #e53e3e, #fc8181);">
+                            <h3>❌ Días con Falta</h3>
+                            <div class="amount">0</div>
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="exportAttendancePDF()">📄 Exportar a PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reporte Fecha Page -->
+        <div class="page" id="reporte-fecha">
+            <div class="table-header" style="margin-bottom: 20px;">Reporte de Asistencia</div>
+            
+            <div class="report-form">
+                <div class="report-filters">
+                    <div class="form-group">
+                        <label class="form-label">📅 Fecha Inicio</label>
+                        <input type="date" class="form-input" id="fecha-inicio" value="2024-10-30">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">📅 Fecha Final</label>
+                        <input type="date" class="form-input" id="fecha-final" value="2024-10-31">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">👤 CÓDIGO (Documento del trabajador)</label>
+                        <input type="text" class="form-input" id="codigo-trabajador" placeholder="98765435" value="98765435">
+                    </div>
+                    <div class="form-group">
+                        <button class="report-button" onclick="generateReport()">✅ Procesar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container" id="report-results" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
+                    <h3>Resultados del Reporte</h3>
+                    <button class="excel-btn" onclick="exportToExcel()">📊 Exportar Excel</button>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Normal</th>
+                            <th>Tarde</th>
+                            <th>Falta</th>
+                        </tr>
+                    </thead>
+                    <tbody id="report-table-body">
+                        <tr>
+                            <td>2024-10-30</td>
+                            <td style="color: #38a169; font-weight: bold;">1</td>
+                            <td>0</td>
+                            <td>0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Planilla Empresa Page -->
+        <div class="page" id="planilla-empresa">
+            <div class="table-header" style="margin-bottom: 20px;">Planilla</div>
+            
+            <div class="table-container">
+                <div class="table-controls">
+                    <select class="table-select">
+                        <option>Mostrar 10 registros</option>
+                    </select>
+                    <input type="text" class="table-search" placeholder="Buscar...">
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Trabajador</th>
+                            <th>Trabaja para</th>
+                            <th>Forma de Pago</th>
+                            <th>Pago</th>
+                            <th>Días trabajadas</th>
+                            <th>Monto a Pagar</th>
+                            <th>🟢</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Saul, Peréz Cueva</td>
+                            <td>Proyecto: PLAZA VEA</td>
+                            <td>Diario</td>
+                            <td>S/ 90.00</td>
+                            <td>1</td>
+                            <td>S/ 90.00</td>
+                            <td><button class="btn-primary" onclick="payWorker('Saul Peréz Cueva')">Pagar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination">
+                    <span>Mostrando registros del 1 al 1 de un total de 1 registros</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gastos Generales Page -->
+        <div class="page" id="gastos-generales">
+            <div class="table-header">
+                💰 Gastos Generales
+                <button class="btn-primary" onclick="openModal('gasto-modal')">+ Nuevo</button>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead style="background: #fed7d7;">
+                        <tr>
+                            <th>Proyecto</th>
+                            <th>Tipo Gasto</th>
+                            <th>Monto</th>
+                            <th>Usuario</th>
+                            <th>Descripción</th>
+                            <th>Comprobante</th>
+                            <th>⚙️</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: #718096; padding: 40px;">
+                                Ningún dato disponible en esta tabla
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div style="background: #c1f0f7; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <h3>Total de Gastos:</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #4299e1;">S/ 0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aportes Page -->
+        <div class="page" id="aportes">
+            <div class="table-header">
+                📊 Lista de Aportes
+                <button class="btn-primary" onclick="openModal('aporte-modal')">+ Nuevo</button>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Monto</th>
+                            <th>Fecha</th>
+                            <th>Descripción</th>
+                            <th>⚙️</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #718096; padding: 40px;">
+                                Ningún dato disponible en esta tabla
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div style="background: #c6f6d5; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <h3>Total de Aportes:</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #38a169;">S/ 0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Justifications View -->
+        <div class="page" id="justifications-view">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">🕒 Justificación de Asistencia</h1>
+                </div>
+                <button class="btn-primary" onclick="goBack()">← Retroceder</button>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Fecha</th>
+                            <th>Motivo</th>
+                            <th>Documento Justificativo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>2024-10-31 01:21:33</td>
+                            <td>por favor validar el ingreso como día laborado</td>
+                            <td>No disponible</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Backup Pages -->
+        <div class="page" id="generar-backup">
+            <h1 class="page-title">DESCARGAR LA COPIA DE SEGURIDAD</h1>
+            
+            <div class="backup-section">
+                <div style="font-size: 80px; color: #ed8936; margin-bottom: 30px;">🗄️</div>
+                <h2 style="margin-bottom: 20px; color: #2d3748;">Generar Backup del Sistema</h2>
+                
+                <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 30px;">
+                    <label for="backup-password" style="color: #4a5568; font-weight: 600;">Contraseña:</label>
+                    <input type="password" id="backup-password" style="padding: 12px 20px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; outline: none; width: 250px;" placeholder="Ingrese contraseña">
+                    <button style="background: #4299e1; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; transition: background 0.3s;" onclick="downloadBackup()">⬇️ Descargar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="restaurar-backup">
+            <h1 class="page-title">RESTAURAR BACKUP</h1>
+            
+            <div class="backup-section">
+                <div style="font-size: 80px; color: #4299e1; margin-bottom: 30px;">📤</div>
+                <h2 style="margin-bottom: 20px; color: #2d3748;">Restaurar Sistema desde Backup</h2>
+                
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 30px;">
+                    <input type="file" accept=".sql,.zip" style="padding: 12px; border: 2px dashed #4299e1; border-radius: 8px; width: 300px;">
+                    <input type="password" placeholder="Contraseña del backup" style="padding: 12px 20px; border: 1px solid #e2e8f0; border-radius: 6px; width: 250px;">
+                    <button class="btn-primary">📤 Restaurar Backup</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other pages -->
+        <div class="page" id="asistencia-masiva">
+            <h1 class="page-title">MARCAR ASISTENCIA MASIVA</h1>
+            <div class="card">
+                <h3>Sistema de Marcado Masivo</h3>
+                <p>Funcionalidad para registrar múltiples asistencias de forma simultánea.</p>
+                <div style="margin-top: 20px;">
+                    <button class="btn-primary">📋 Cargar Lista Excel</button>
+                    <button class="btn-secondary" style="margin-left: 10px;">⏰ Marcar Todas</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="planilla-contratista">
+            <h1 class="page-title">PLANILLA CONTRATISTA</h1>
+            <div class="table-container">
+                <div class="table-header">
+                    Planilla de Contratistas
+                    <button class="btn-primary">+ Generar Planilla</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Razón Social</th>
+                            <th>RUC</th>
+                            <th>Pendiente</th>
+                            <th>Responsable</th>
+                            <th>Teléfono</th>
+                            <th>Email</th>
+                            <th>Info</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CONSTRUCTOR SAC</td>
+                            <td>20487131901</td>
+                            <td style="color: #38a169; font-weight: bold;">S/ 5,000.00</td>
+                            <td>Julia Chamorro</td>
+                            <td>876543221</td>
+                            <td>julia@constructor.com</td>
+                            <td><button class="btn-primary">Info</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="page" id="techo-presupuestal">
+            <h1 class="page-title">TECHO PRESUPUESTAL</h1>
+            <div class="card">
+                <h3>Gestión de Presupuesto</h3>
+                <div class="summary-cards">
+                    <div class="summary-card" style="background: linear-gradient(135deg, #4299e1, #63b3ed);">
+                        <h3>Presupuesto Total</h3>
+                        <div class="amount">S/ 50,000.00</div>
+                    </div>
+                    <div class="summary-card" style="background: linear-gradient(135deg, #ed8936, #f6ad55);">
+                        <h3>Ejecutado</h3>
+                        <div class="amount">S/ 5,000.00</div>
+                    </div>
+                    <div class="summary-card" style="background: linear-gradient(135deg, #38a169, #68d391);">
+                        <h3>Disponible</h3>
+                        <div class="amount">S/ 45,000.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="ayuda">
+            <h1 class="page-title">AYUDA Y SOPORTE</h1>
+            <div class="card">
+                <h3>Sistema Administrativo FAMETEL</h3>
+                <p style="margin: 20px 0;">Para soporte técnico, contacte al administrador del sistema.</p>
+                <div style="background: #f7fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p><strong>Versión:</strong> 1.0.0</p>
+                    <p><strong>Desarrollado por:</strong> Casasinmuebles - 2024</p>
+                    <p><strong>Contacto:</strong> soporte@casasinmuebles.com</p>
+                </div>
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <div class="card-icon blue">📖</div>
+                        <div class="card-title">Manual de Usuario</div>
+                        <div class="card-subtitle">Guía completa del sistema</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon green">💬</div>
+                        <div class="card-title">Soporte Técnico</div>
+                        <div class="card-subtitle">Asistencia especializada</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    
+    <!-- Sistemas Modal -->
+    <div class="modal" id="sistemas-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nuevo Sistema</h2>
+                <button class="modal-close" onclick="closeModal('sistemas-modal')">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Sistema</label>
+                <input type="text" class="form-input" placeholder="Nombre del sistema">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Título - Inicio</label>
+                <input type="text" class="form-input" placeholder="Título de inicio">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Código</label>
+                <input type="text" class="form-input" value="Central 2060101" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Imagen</label>
+                <input type="file" class="form-input" accept="image/*">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Características</label>
+                <textarea class="form-textarea" placeholder="Descripción de características"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Descripción - Inicio</label>
+                <textarea class="form-textarea" placeholder="Descripción detallada"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-cancel" onclick="closeModal('sistemas-modal')">Cancelar</button>
+                <button class="btn-primary" onclick="saveSistema()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Obras Modal -->
+    <div class="modal" id="obras-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nuevo Proyecto</h2>
+                <button class="modal-close" onclick="closeModal('obras-modal')">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Empresa</label>
+                <input type="text" class="form-input" placeholder="Nombre de la empresa">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Razón Social</label>
+                <input type="text" class="form-input" placeholder="Razón social">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">RUC</label>
+                <input type="text" class="form-input" placeholder="RUC de la empresa" maxlength="11">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Proyecto / Obra</label>
+                <input type="text" class="form-input" placeholder="Nombre del proyecto">
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Residente</label>
+                    <select class="form-select">
+                        <option>Seleccionar</option>
+                        <option>María Bellido</option>
+                        <option>Carlos Mendoza</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Gerente</label>
+                    <select class="form-select">
+                        <option>Seleccionar</option>
+                        <option>Ana García</option>
+                        <option>Luis Rodríguez</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Teléfono 1</label>
+                    <input type="tel" class="form-input" placeholder="987654321">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Teléfono 2</label>
+                    <input type="tel" class="form-input" placeholder="Teléfono alternativo">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Correo</label>
+                <input type="email" class="form-input" placeholder="correo@empresa.com">
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Inicio</label>
+                    <input type="date" class="form-input" value="2024-11-01">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Final</label>
+                    <input type="date" class="form-input" value="2024-11-30">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Presupuesto Asignado</label>
+                <input type="number" class="form-input" placeholder="5000" value="5000">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Servicio a Realizar</label>
+                <textarea class="form-textarea" placeholder="Descripción del servicio">pinturas</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Contrato</label>
+                <input type="file" class="form-input" accept=".pdf,.doc,.docx">
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-cancel" onclick="closeModal('obras-modal')">Cancelar</button>
+                <button class="btn-primary" onclick="saveObra()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal Modal -->
+    <div class="modal" id="personal-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nuevo Administrativo</h2>
+                <button class="modal-close" onclick="closeModal('personal-modal')">×</button>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Nombres</label>
+                    <input type="text" class="form-input" placeholder="Nombres">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Apellidos</label>
+                    <input type="text" class="form-input" placeholder="Apellidos">
+                </div>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">DNI</label>
+                    <input type="text" class="form-input" placeholder="DNI" maxlength="8">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Teléfono</label>
+                    <input type="tel" class="form-input" placeholder="Teléfono">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Correo</label>
+                <input type="email" class="form-input" placeholder="correo@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Cargo</label>
+                <select class="form-select">
+                    <option>Seleccionar cargo</option>
+                    <option>Desarrollador</option>
+                    <option>Administrador</option>
+                    <option>Almacenero</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Usuario</label>
+                <input type="text" class="form-input" placeholder="Usuario del sistema">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Contraseña</label>
+                <input type="password" class="form-input" placeholder="Contraseña">
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-cancel" onclick="closeModal('personal-modal')">Cancelar</button>
+                <button class="btn-primary" onclick="savePersonal()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cargos Modal -->
+    <div class="modal" id="cargos-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Cargos / Responsabilidades</h2>
+                <button class="modal-close" onclick="closeModal('cargos-modal')">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Cargo</label>
+                <input type="text" class="form-input" placeholder="Nombre del cargo">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Detalle</label>
+                <textarea class="form-textarea" placeholder="Descripción del cargo"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-primary" onclick="saveCargo()">Guardar</button>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <h3>Cargos Existentes:</h3>
+                <table style="width: 100%; margin-top: 15px;">
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid #e2e8f0; padding: 10px;">Cargo</th>
+                            <th style="border: 1px solid #e2e8f0; padding: 10px;">Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="border: 1px solid #e2e8f0; padding: 10px;">Desarrollador</td>
+                            <td style="border: 1px solid #e2e8f0; padding: 10px;">Desarrollo de software</td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #e2e8f0; padding: 10px;">Administrador</td>
+                            <td style="border: 1px solid #e2e8f0; padding: 10px;">Administración del sistema</td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #e2e8f0; padding: 10px;">Almacenero</td>
+                            <td style="border: 1px solid #e2e8f0; padding: 10px;">Gestión de almacén</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empresa Modal -->
+    <div class="modal" id="empresa-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nueva Empresa</h2>
+                <button class="modal-close" onclick="closeModal('empresa-modal')">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Razón Social</label>
+                <input type="text" class="form-input" placeholder="Razón social de la empresa">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">RUC</label>
+                <input type="text" class="form-input" placeholder="RUC" maxlength="11">
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Teléfono</label>
+                    <input type="tel" class="form-input" placeholder="Teléfono">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Correo</label>
+                    <input type="email" class="form-input" placeholder="correo@empresa.com">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Responsable</label>
+                <input type="text" class="form-input" placeholder="Nombre del responsable">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Dirección</label>
+                <textarea class="form-textarea" placeholder="Dirección completa"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-cancel" onclick="closeModal('empresa-modal')">Cancelar</button>
+                <button class="btn-primary" onclick="saveEmpresa()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Proveedor Modal -->
+    <div class="modal" id="proveedor-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nuevo Proveedor</h2>
+                <button class="modal-close" onclick="closeModal('proveedor-modal')">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Razón social</label>
+                <input type="text" class="form-input" placeholder="Razón social">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">RUC</label>
+                <input type="text" class="form-input" placeholder="RUC" maxlength="11">
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Correo</label>
+                    <input type="email" class="form-input" placeholder="correo@proveedor.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Teléfono</label>
+                    <input type="tel" class="form-input" placeholder="Teléfono">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Responsable</label>
+                <input type="text" class="form-input" placeholder="Nombre del responsable">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Dirección</label>
+                <textarea class="form-textarea" placeholder="Dirección completa"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-cancel" onclick="closeModal('proveedor-modal')">Cancelar</button>
+                <button class="btn-primary" onclick="saveProveedor()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Justificar Modal -->
+    <div class="modal" id="justificar-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Registro Justificación</h2>
+                <button class="modal-close" onclick="closeModal('justificar-modal')">×</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Estado</label>
+                <select class="form-select">
+                    <option>Normal</option>
+                    <option>Tardanza</option>
+                    <option>Falta</option>
+                    <option>Permiso</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Justificación</label>
+                <textarea class="form-textarea" placeholder="Describe el motivo de la justificación">por favor validar el ingreso como día laborado</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Archivo</label>
+                <input type="file" class="form-input" accept=".pdf,.jpg,.png,.doc,.docx">
+                <small style="color: #718096;">Adjunta un documento justificativo</small>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn-cancel" onclick="closeModal('justificar-modal')">Cerrar</button>
+                <button class="btn-primary" onclick="saveJustificacion()">Guardar</button>
+            </div>
+        </div>
+    </div
